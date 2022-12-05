@@ -43,7 +43,10 @@ def threaded_client(conn, p, gameId):
             if gameId in games:
                 if flag:
                     game = games[gameId]
-                    game.rounds[p] = numRounds
+                    if p == 0:
+                        game.rounds[p] = numRounds
+                    if p == 1:
+                        game.rounds[p] = game.rounds[0]
                     flag = False
                 if not flag:
                     game = games[gameId]
@@ -55,7 +58,7 @@ def threaded_client(conn, p, gameId):
                         game.resetWent()
                     elif data != "get":
                         game.play(p, data)
-                        game.rounds[p] -= 1
+                        game.rounds[p]-=1
 
                     conn.sendall(pickle.dumps(game))
             else:
@@ -63,16 +66,9 @@ def threaded_client(conn, p, gameId):
         except:
             break
 
-        if game.rounds[0] == 0:
-            print("Game over")
-            try:
-                del games[gameId]
-                print("Closing Game", gameId)
-            except:
-                pass
-            idCount -= 1
-            conn.close()
+                
 
+        
     print("Lost connection")
     try:
         del games[gameId]
@@ -83,18 +79,20 @@ def threaded_client(conn, p, gameId):
     conn.close()
 
 
+
 while True:
     conn, addr = s.accept()
     print("Connected to:", addr)
 
     idCount += 1
     p = 0
-    gameId = (idCount - 1) // 2
+    gameId = (idCount - 1)//2
     if idCount % 2 == 1:
         games[gameId] = Game(gameId)
         print("Creating a new game...")
     else:
         games[gameId].ready = True
         p = 1
+
 
     start_new_thread(threaded_client, (conn, p, gameId))

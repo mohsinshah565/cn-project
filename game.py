@@ -8,8 +8,8 @@ class Game:
         self.moves = [None, None]
         self.wins = [0,0]
         self.ties = 0
-        self.rounds = [-1, -1]
-        self.status = "NULL"
+        self.rounds = [200, 200]
+        self.status = 0
 
     def get_player_move(self, p):
         """
@@ -60,3 +60,6 @@ class Game:
     def resetWent(self):
         self.p1Went = False
         self.p2Went = False
+        if self.rounds[0] == 0 and self.rounds[1] == 0:
+            self.status = 1
+ 
